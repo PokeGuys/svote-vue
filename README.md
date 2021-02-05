@@ -7,6 +7,7 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
+cp .env.example .env
 yarn serve
 ```
 
