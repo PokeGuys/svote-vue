@@ -46,10 +46,20 @@ import { PollDto } from '../api/api.interface';
   },
 })
 export default class PollDetail extends Vue {
-  public readonly poll?: PollDto;
+  public poll?: PollDto;
 
   get options() {
     if (this.poll !== undefined) {
+      console.log('re-render?', {
+        question: this.poll.title,
+        finalResults: this.poll.voted,
+        answers: this.poll.options.map((option) => ({
+          value: option.optionId,
+          text: option.text,
+          votes: option.count,
+          ...(option.voted !== undefined && { selected: option.voted }),
+        })),
+      });
       return {
         question: this.poll.title,
         finalResults: this.poll.voted,
@@ -65,9 +75,8 @@ export default class PollDetail extends Vue {
   }
 
   addVote(obj: any) {
-    console.log(obj);
     this.$store.dispatch('poll/vote', obj.value).then((result) => {
-      console.log(result);
+      this.poll = result;
     });
   }
 }

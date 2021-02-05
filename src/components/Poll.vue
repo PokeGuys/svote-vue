@@ -17,7 +17,7 @@
           </div>
           <span class="bg" :style="{ width: visibleResults ? ans.percent : '0%' }"></span>
         </template>
-        <template v-else>
+        <template v-else-if="showResult">
           <div :class="{ 'ans-voted': true, final: true, selected: ans.selected }">
             <span v-if="ans.percent" class="percent" v-text="ans.percent"></span>
             <span class="txt" v-text="ans.text"></span>
@@ -28,7 +28,7 @@
           ></span>
         </template>
       </div>
-      <div class="votes" v-if="visibleResults || finalResults" v-text="totalVotes + ' votes'"></div>
+      <div class="votes" v-if="finalResults" v-text="totalVotes + ' votes'"></div>
     </div>
   </div>
 </template>
@@ -46,6 +46,11 @@ export interface Answer {
 
 @Component({
   name: 'Poll',
+  watch: {
+    answers(newState: any) {
+      (this as any).localAnswers = newState;
+    },
+  },
 })
 export default class Poll extends Vue {
   @Prop() private readonly question!: string;
@@ -56,6 +61,11 @@ export default class Poll extends Vue {
     default: false,
   })
   private readonly finalResults!: boolean;
+
+  @Prop({
+    default: true,
+  })
+  private readonly showResult!: boolean;
 
   public visibleResults!: boolean;
 
@@ -104,7 +114,7 @@ export default class Poll extends Vue {
     ans.votes += 1;
     ans.selected = true;
     this.localAnswers = [...this.localAnswers];
-    this.visibleResults = true;
+    this.visibleResults = this.showResult;
     this.$emit('voted', {
       ...ans,
       totalVotes: this.totalVotes,
